@@ -9,6 +9,7 @@ import type {
   User,
 } from "./models";
 import type { ProjectWithTaskCount } from "./views";
+import { buildProjectWithTaskCount } from "../utils/projectMetrics";
 
 export const exampleFeatureFlags: FeatureFlags = {
   scheduling: true,
@@ -62,12 +63,8 @@ export const exampleTask: Task = {
 
 export const exampleTasks: Task[] = [exampleTask];
 
-export const exampleProjectWithTaskCount: ProjectWithTaskCount = {
-  ...exampleProject,
-  taskCount: exampleTasks.filter(
-    (task) => task.projectId === exampleProject._id,
-  ).length,
-};
+export const exampleProjectWithTaskCount: ProjectWithTaskCount =
+  buildProjectWithTaskCount(exampleProject, exampleTasks);
 
 
 

@@ -8,6 +8,7 @@ import type { Project } from "../types/models";
 import type { ProjectWithTaskCount } from "../types/views";
 import { useAuth } from "../hooks/useAuth";
 import { canDeleteResources } from "../utils/permissions";
+import { buildProjectWithTaskCount } from "../utils/projectMetrics";
 
 
 
@@ -28,13 +29,7 @@ export const ProjectsPage = () => {
         projectService.list(),
         taskService.list(),
       ]);
-      setProjects(
-        nextProjects.map((project) => ({
-          ...project,
-          taskCount: tasks.filter((task) => task.projectId === project._id)
-            .length,
-        })),
-      );
+      setProjects(nextProjects.map((project) => buildProjectWithTaskCount(project, tasks)));
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Unable to load projects",
@@ -55,7 +50,9 @@ export const ProjectsPage = () => {
 
     try {
       const project = await projectService.create(formState);
-      setProjects((current) => [{ ...project, taskCount: 0 }, ...current]);
+      setProjects(
+        (current) => [buildProjectWithTaskCount(project, []), ...current],
+      );
       setFormState({ name: "", description: "" });
     } catch (submitError) {
       setError(
