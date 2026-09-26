@@ -170,7 +170,7 @@ export const DashboardPage = () => {
             )}
           </div>
         </div>
-        <div className="space-y-6">
+        <div className="space-y-6"> 
           <div className="rounded-[20px] bg-white p-8 shadow-sm">
             <h2 className="text-xl font-bold text-ink">Feature flags</h2>
             <ul className="mt-4 space-y-3">
@@ -188,6 +188,38 @@ export const DashboardPage = () => {
                 ),
               )}
             </ul>
+          </div>
+          <div className="rounded-[20px] bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-ink">Members</h2>
+              <span className="text-sm font-medium text-slate-500">
+                {data.users.length}
+              </span>
+            </div>
+            {data.users.length ? (
+              <ul className="mt-3 divide-y divide-slate-200">
+                {data.users.slice(0, 4).map((member) => (
+                  <li
+                    className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                    key={member._id}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-ink">
+                        {member.firstName} {member.lastName}
+                      </p>
+                      <p className="truncate text-xs text-slate-500">
+                        {member.email}
+                      </p>
+                    </div>
+                    <span className="shrink-0 pt-0.5 text-xs capitalize text-slate-500">
+                      {member.role}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500">No members found.</p>
+            )}
           </div>
           <div className="rounded-[20px] bg-white p-8 shadow-sm">
             <h2 className="text-xl font-bold text-ink">Scheduling</h2>
