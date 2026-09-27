@@ -52,7 +52,8 @@ export const exampleTask: Task = {
   organizationId: exampleOrganization._id,
   projectId: exampleProject._id,
   title: "Review navigation changes",
-  description: "Review the proposed navigation structure with the delivery team.",
+  description:
+    "Review the proposed navigation structure with the delivery team.",
   status: "in_progress",
   priority: "high",
   assignedTo: exampleUser._id,
@@ -65,6 +66,3 @@ export const exampleTasks: Task[] = [exampleTask];
 
 export const exampleProjectWithTaskCount: ProjectWithTaskCount =
   buildProjectWithTaskCount(exampleProject, exampleTasks);
-
-
-

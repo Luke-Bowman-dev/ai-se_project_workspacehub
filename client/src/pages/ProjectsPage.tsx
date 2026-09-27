@@ -10,8 +10,6 @@ import { useAuth } from "../hooks/useAuth";
 import { canCreateProject, canDeleteResources } from "../utils/permissions";
 import { buildProjectWithTaskCount } from "../utils/projectMetrics";
 
-
-
 export const ProjectsPage = () => {
   const { user } = useAuth();
   const [projects, setProjects] = useState<ProjectWithTaskCount[]>([]);
@@ -30,7 +28,11 @@ export const ProjectsPage = () => {
         projectService.list(),
         taskService.list(),
       ]);
-      setProjects(nextProjects.map((project) => buildProjectWithTaskCount(project, tasks)));
+      setProjects(
+        nextProjects.map((project) =>
+          buildProjectWithTaskCount(project, tasks),
+        ),
+      );
     } catch (loadError) {
       setLoadError(
         loadError instanceof Error
@@ -53,9 +55,10 @@ export const ProjectsPage = () => {
 
     try {
       const project = await projectService.create(formState);
-      setProjects(
-        (current) => [buildProjectWithTaskCount(project, []), ...current],
-      );
+      setProjects((current) => [
+        buildProjectWithTaskCount(project, []),
+        ...current,
+      ]);
       setFormState({ name: "", description: "" });
     } catch (submitError) {
       setActionError(
@@ -165,7 +168,8 @@ export const ProjectsPage = () => {
                         {project.description}
                       </p>
                       <p className="mt-2 text-sm text-slate-500">
-                        {project.taskCount} {project.taskCount === 1 ? "task" : "tasks"}
+                        {project.taskCount}{" "}
+                        {project.taskCount === 1 ? "task" : "tasks"}
                       </p>
                     </div>
                     <div className="flex gap-2">

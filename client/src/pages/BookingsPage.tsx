@@ -78,11 +78,7 @@ export const BookingsPage = () => {
       errors.endsAt = "Enter a valid end date and time.";
     }
 
-    if (
-      !errors.startsAt &&
-      !errors.endsAt &&
-      endsAt <= startsAt
-    ) {
+    if (!errors.startsAt && !errors.endsAt && endsAt <= startsAt) {
       errors.endsAt = "The end time must be after the start time.";
     }
 
@@ -214,10 +210,7 @@ export const BookingsPage = () => {
     setBookingErrors((current) => ({ ...current, [bookingId]: "" }));
 
     try {
-      const updatedBooking = await bookingService.update(
-        bookingId,
-        formState,
-      );
+      const updatedBooking = await bookingService.update(bookingId, formState);
       setBookings((current) =>
         current.map((booking) =>
           booking._id === bookingId ? updatedBooking : booking,
@@ -296,7 +289,9 @@ export const BookingsPage = () => {
             <div>
               <input
                 className="w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 placeholder:text-[#94A3B880]"
-                onBlur={() => setCreateTouched((current) => ({ ...current, title: true }))}
+                onBlur={() =>
+                  setCreateTouched((current) => ({ ...current, title: true }))
+                }
                 onChange={(event) =>
                   setCreateState((current) => ({
                     ...current,
@@ -377,7 +372,9 @@ export const BookingsPage = () => {
                 value={createState.endsAt}
               />
               {createTouched.endsAt && createErrors.endsAt ? (
-                <p className="mt-1 text-sm text-danger">{createErrors.endsAt}</p>
+                <p className="mt-1 text-sm text-danger">
+                  {createErrors.endsAt}
+                </p>
               ) : null}
             </div>
             {createError ? (
@@ -409,15 +406,9 @@ export const BookingsPage = () => {
                         <input
                           className="w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 disabled:bg-slate-100"
                           disabled={!canEdit}
-                          onBlur={() =>
-                            handleEditBlur(booking._id, "title")
-                          }
+                          onBlur={() => handleEditBlur(booking._id, "title")}
                           onChange={(event) =>
-                            handleEdit(
-                              booking._id,
-                              "title",
-                              event.target.value,
-                            )
+                            handleEdit(booking._id, "title", event.target.value)
                           }
                           value={formState?.title ?? booking.title}
                         />
@@ -441,9 +432,7 @@ export const BookingsPage = () => {
                               event.target.value,
                             )
                           }
-                          value={
-                            formState?.description ?? booking.description
-                          }
+                          value={formState?.description ?? booking.description}
                         />
                         {touched.description && editErrors.description ? (
                           <p className="mt-1 text-sm text-danger">
@@ -455,9 +444,7 @@ export const BookingsPage = () => {
                         <input
                           className="w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 disabled:bg-slate-100"
                           disabled={!canEdit}
-                          onBlur={() =>
-                            handleEditBlur(booking._id, "startsAt")
-                          }
+                          onBlur={() => handleEditBlur(booking._id, "startsAt")}
                           onChange={(event) =>
                             handleEdit(
                               booking._id,

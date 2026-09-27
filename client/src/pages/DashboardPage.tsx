@@ -143,9 +143,7 @@ export const DashboardPage = () => {
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div>
-                        <h3 className="font-semibold text-ink">
-                          {task.title}
-                        </h3>
+                        <h3 className="font-semibold text-ink">{task.title}</h3>
                         <p className="text-[13px] text-slate-500">
                           Due {formatDateTime(task.dueDate)}
                         </p>
@@ -170,7 +168,7 @@ export const DashboardPage = () => {
             )}
           </div>
         </div>
-        <div className="space-y-6"> 
+        <div className="space-y-6">
           <div className="rounded-[20px] bg-white p-8 shadow-sm">
             <h2 className="text-xl font-bold text-ink">Feature flags</h2>
             <ul className="mt-4 space-y-3">
@@ -232,9 +230,7 @@ export const DashboardPage = () => {
                         className="rounded-2xl border border-slate-200 px-4 py-3"
                         key={booking._id}
                       >
-                        <p className="font-medium text-ink">
-                          {booking.title}
-                        </p>
+                        <p className="font-medium text-ink">{booking.title}</p>
                         <p className="text-sm text-slate-500">
                           {formatDateTime(booking.startsAt)} to{" "}
                           {formatDateTime(booking.endsAt)}

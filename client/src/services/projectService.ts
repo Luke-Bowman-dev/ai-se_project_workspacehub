@@ -10,10 +10,8 @@ export const projectService = {
   getById: (id: string) => unwrapResponse<Project>(api.get(`/projects/${id}`)),
   create: (payload: ProjectCreatePayload) =>
     unwrapResponse<Project>(api.post("/projects", payload)),
-  update: (
-    id: string,
-    payload: ProjectUpdatePayload,
-  ) => unwrapResponse<Project>(api.patch(`/projects/${id}`, payload)),
+  update: (id: string, payload: ProjectUpdatePayload) =>
+    unwrapResponse<Project>(api.patch(`/projects/${id}`, payload)),
   delete: (id: string) =>
     unwrapResponse<{ deleted: boolean }>(api.delete(`/projects/${id}`)),
 };
