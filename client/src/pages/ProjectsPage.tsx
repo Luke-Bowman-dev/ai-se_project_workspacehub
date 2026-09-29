@@ -4,7 +4,6 @@ import { PageHeader } from "../components/PageHeader";
 import { StatusPanel } from "../components/StatusPanel";
 import { projectService } from "../services/projectService";
 import { taskService } from "../services/taskService";
-import type { Project } from "../types/models";
 import type { ProjectWithTaskCount } from "../types/views";
 import { useAuth } from "../hooks/useAuth";
 import { canCreateProject, canDeleteResources } from "../utils/permissions";
@@ -110,7 +109,9 @@ export const ProjectsPage = () => {
         {canCreate ? (
           <form
             className="rounded-3xl bg-white p-6 shadow-sm"
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              void handleSubmit(e);
+            }}
           >
             <h2 className="text-xl font-semibold text-ink">Create project</h2>
             <div className="mt-4 space-y-4">

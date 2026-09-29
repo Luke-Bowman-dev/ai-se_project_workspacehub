@@ -9,7 +9,8 @@ import { taskService } from "../services/taskService";
 import { userService } from "../services/userService";
 import { useAuth } from "../hooks/useAuth";
 import type { Booking, Project, Task, User } from "../types/models";
-import { formatDateInput, formatDateTime } from "../utils/date";
+import { formatDateTime } from "../utils/date";
+import { FeatureFlags } from "../types/models";
 
 interface DashboardData {
   projects: Project[];
@@ -172,19 +173,22 @@ export const DashboardPage = () => {
           <div className="rounded-[20px] bg-white p-8 shadow-sm">
             <h2 className="text-xl font-bold text-ink">Feature flags</h2>
             <ul className="mt-4 space-y-3">
-              {Object.entries(organization?.featureFlags ?? {}).map(
-                ([key, value]) => (
-                  <li
-                    className="flex items-center justify-between rounded-[12px] border border-slate-200 p-[18px]"
-                    key={key}
-                  >
-                    <span className="font-semibold capitalize text-ink">
-                      {key.replace(/([A-Z])/g, " $1")}
-                    </span>
-                    <Checkbox checked={value} disabled />
-                  </li>
-                ),
-              )}
+              {Object.entries(
+                (organization?.featureFlags ?? {}) as Record<
+                  keyof FeatureFlags,
+                  boolean
+                >,
+              ).map(([key, value]) => (
+                <li
+                  className="flex items-center justify-between rounded-[12px] border border-slate-200 p-[18px]"
+                  key={key}
+                >
+                  <span className="font-semibold capitalize text-ink">
+                    {key.replace(/([A-Z])/g, " $1")}
+                  </span>
+                  <Checkbox checked={value} disabled />
+                </li>
+              ))}
             </ul>
           </div>
           <div className="rounded-[20px] bg-white p-6 shadow-sm">

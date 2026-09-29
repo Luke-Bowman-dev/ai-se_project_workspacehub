@@ -1,13 +1,4 @@
-import type {
-  AuthSession,
-  Booking,
-  FeatureFlags,
-  MePayload,
-  Organization,
-  Project,
-  Task,
-  User,
-} from "./models";
+import type { FeatureFlags, Organization, Project, Task, User } from "./models";
 import type { ProjectWithTaskCount } from "./views";
 import { buildProjectWithTaskCount } from "../utils/projectMetrics";
 
