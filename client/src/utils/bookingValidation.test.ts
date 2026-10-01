@@ -26,11 +26,11 @@ describe("validateBookingFormState", () => {
   });
 
   it("rejects a title shorter than two characters", () => {
-    expect(
-      validateBookingFormState({ ...validFormState, title: "A" }),
-    ).toEqual({
-      title: "Enter a booking title with at least 2 characters.",
-    });
+    expect(validateBookingFormState({ ...validFormState, title: "A" })).toEqual(
+      {
+        title: "Enter a booking title with at least 2 characters.",
+      },
+    );
   });
 
   it("reports an invalid start date string", () => {

@@ -42,9 +42,7 @@ export interface Project {
 
 export type ProjectCreatePayload = Pick<Project, "name" | "description">;
 
-export type ProjectUpdatePayload = Partial<
-  Pick<Project, "name" | "description">
->;
+export type ProjectUpdatePayload = Partial<ProjectCreatePayload>;
 
 export interface Task {
   _id: string;

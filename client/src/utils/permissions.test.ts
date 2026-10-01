@@ -21,15 +21,21 @@ const buildUser = (role: UserRole): User => ({
 });
 
 describe("isPrivilegedRole", () => {
-  it.each(roleCases)("returns $expected for role $role", ({ role, expected }) => {
-    expect(isPrivilegedRole(role)).toBe(expected);
-  });
+  it.each(roleCases)(
+    "returns $expected for role $role",
+    ({ role, expected }) => {
+      expect(isPrivilegedRole(role)).toBe(expected);
+    },
+  );
 });
 
 describe("canCreateProject", () => {
-  it.each(roleCases)("returns $expected for role $role", ({ role, expected }) => {
-    const user = role === null ? null : buildUser(role);
+  it.each(roleCases)(
+    "returns $expected for role $role",
+    ({ role, expected }) => {
+      const user = role === null ? null : buildUser(role);
 
-    expect(canCreateProject(user)).toBe(expected);
-  });
+      expect(canCreateProject(user)).toBe(expected);
+    },
+  );
 });

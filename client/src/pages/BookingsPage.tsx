@@ -15,7 +15,6 @@ interface BookingFormState {
   endsAt: string;
 }
 
-
 type BookingFormTouched = Partial<Record<keyof BookingFormState, boolean>>;
 
 const buildBookingFormState = (booking: Booking): BookingFormState => ({
@@ -42,12 +41,11 @@ export const BookingsPage = () => {
   });
   const [createTouched, setCreateTouched] = useState<BookingFormTouched>({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [bookingErrors, setBookingErrors] = useState<Record<string, string>>(
     {},
   );
-
-
 
   const allFieldsTouched: BookingFormTouched = {
     title: true,
@@ -64,6 +62,7 @@ export const BookingsPage = () => {
       }
 
       setLoading(true);
+      setLoadError(null);
       setCreateError(null);
 
       try {
@@ -78,7 +77,7 @@ export const BookingsPage = () => {
           ),
         );
       } catch (loadError) {
-        setCreateError(
+        setLoadError(
           loadError instanceof Error
             ? loadError.message
             : "Unable to load bookings",
@@ -233,6 +232,10 @@ export const BookingsPage = () => {
         message="Fetching schedule items."
       />
     );
+  }
+
+  if (loadError) {
+    return <StatusPanel title="Bookings unavailable" message={loadError} />;
   }
 
   const createErrors = validateBookingFormState(createState);

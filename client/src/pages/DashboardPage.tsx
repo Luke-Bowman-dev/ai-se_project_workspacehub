@@ -34,12 +34,12 @@ export const DashboardPage = () => {
     bookings: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
       setLoading(true);
-      setError(null);
+      setLoadError(null);
 
       try {
         const [projects, tasks, users, bookings] = await Promise.all([
@@ -53,7 +53,7 @@ export const DashboardPage = () => {
 
         setData({ projects, tasks, users, bookings });
       } catch (loadError) {
-        setError(
+        setLoadError(
           loadError instanceof Error
             ? loadError.message
             : "Unable to load dashboard",
@@ -85,8 +85,8 @@ export const DashboardPage = () => {
     );
   }
 
-  if (error) {
-    return <StatusPanel title="Dashboard unavailable" message={error} />;
+  if (loadError) {
+    return <StatusPanel title="Dashboard unavailable" message={loadError} />;
   }
 
   return (
