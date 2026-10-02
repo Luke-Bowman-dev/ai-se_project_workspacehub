@@ -9,7 +9,8 @@ import { taskService } from "../services/taskService";
 import { userService } from "../services/userService";
 import { useAuth } from "../hooks/useAuth";
 import type { Booking, Project, Task, User } from "../types/models";
-import { formatDateInput, formatDateTime } from "../utils/date";
+import { formatDateTime } from "../utils/date";
+import { FeatureFlags } from "../types/models";
 
 interface DashboardData {
   projects: Project[];
@@ -33,12 +34,12 @@ export const DashboardPage = () => {
     bookings: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
       setLoading(true);
-      setError(null);
+      setLoadError(null);
 
       try {
         const [projects, tasks, users, bookings] = await Promise.all([
@@ -52,7 +53,7 @@ export const DashboardPage = () => {
 
         setData({ projects, tasks, users, bookings });
       } catch (loadError) {
-        setError(
+        setLoadError(
           loadError instanceof Error
             ? loadError.message
             : "Unable to load dashboard",
@@ -84,8 +85,8 @@ export const DashboardPage = () => {
     );
   }
 
-  if (error) {
-    return <StatusPanel title="Dashboard unavailable" message={error} />;
+  if (loadError) {
+    return <StatusPanel title="Dashboard unavailable" message={loadError} />;
   }
 
   return (
@@ -143,9 +144,7 @@ export const DashboardPage = () => {
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div>
-                        <h3 className="font-semibold text-ink">
-                          {task.title}
-                        </h3>
+                        <h3 className="font-semibold text-ink">{task.title}</h3>
                         <p className="text-[13px] text-slate-500">
                           Due {formatDateTime(task.dueDate)}
                         </p>
@@ -174,20 +173,55 @@ export const DashboardPage = () => {
           <div className="rounded-[20px] bg-white p-8 shadow-sm">
             <h2 className="text-xl font-bold text-ink">Feature flags</h2>
             <ul className="mt-4 space-y-3">
-              {Object.entries(organization?.featureFlags ?? {}).map(
-                ([key, value]) => (
-                  <li
-                    className="flex items-center justify-between rounded-[12px] border border-slate-200 p-[18px]"
-                    key={key}
-                  >
-                    <span className="font-semibold capitalize text-ink">
-                      {key.replace(/([A-Z])/g, " $1")}
-                    </span>
-                    <Checkbox checked={value} disabled />
-                  </li>
-                ),
-              )}
+              {Object.entries(
+                (organization?.featureFlags ?? {}) as Record<
+                  keyof FeatureFlags,
+                  boolean
+                >,
+              ).map(([key, value]) => (
+                <li
+                  className="flex items-center justify-between rounded-[12px] border border-slate-200 p-[18px]"
+                  key={key}
+                >
+                  <span className="font-semibold capitalize text-ink">
+                    {key.replace(/([A-Z])/g, " $1")}
+                  </span>
+                  <Checkbox checked={value} disabled />
+                </li>
+              ))}
             </ul>
+          </div>
+          <div className="rounded-[20px] bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-ink">Members</h2>
+              <span className="text-sm font-medium text-slate-500">
+                {data.users.length}
+              </span>
+            </div>
+            {data.users.length ? (
+              <ul className="mt-3 divide-y divide-slate-200">
+                {data.users.slice(0, 4).map((member) => (
+                  <li
+                    className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                    key={member._id}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-ink">
+                        {member.firstName} {member.lastName}
+                      </p>
+                      <p className="truncate text-xs text-slate-500">
+                        {member.email}
+                      </p>
+                    </div>
+                    <span className="shrink-0 pt-0.5 text-xs capitalize text-slate-500">
+                      {member.role}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500">No members found.</p>
+            )}
           </div>
           <div className="rounded-[20px] bg-white p-8 shadow-sm">
             <h2 className="text-xl font-bold text-ink">Scheduling</h2>
@@ -200,9 +234,7 @@ export const DashboardPage = () => {
                         className="rounded-2xl border border-slate-200 px-4 py-3"
                         key={booking._id}
                       >
-                        <p className="font-medium text-ink">
-                          {booking.title}
-                        </p>
+                        <p className="font-medium text-ink">{booking.title}</p>
                         <p className="text-sm text-slate-500">
                           {formatDateTime(booking.startsAt)} to{" "}
                           {formatDateTime(booking.endsAt)}

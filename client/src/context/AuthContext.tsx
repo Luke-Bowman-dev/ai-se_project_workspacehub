@@ -2,6 +2,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useCallback,
   type PropsWithChildren,
 } from "react";
 import {
@@ -40,15 +41,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     setOrganization(nextOrganization);
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
+    // 2. Wrap logout in useCallback so it's a stable dependency
     window.localStorage.removeItem(STORAGE_KEY);
     setAuthToken(null);
     setToken(null);
     setUser(null);
     setOrganization(null);
-  };
+  }, []);
 
-  const refreshSession = async () => {
+  const refreshSession = useCallback(async () => {
+    // 3. Wrap refreshSession in useCallback
     if (!token) {
       logout();
       return;
@@ -58,7 +61,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const session = await authService.me();
     setUser(session.user);
     setOrganization(session.organization);
-  };
+  }, [token, logout]);
 
   useEffect(() => {
     const hydrate = async () => {
@@ -77,17 +80,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     };
 
     void hydrate();
-  }, []);
+  }, [token, refreshSession, logout]);
 
-  const login = async (payload: LoginPayload) => {
+  const login = useCallback(async (payload: LoginPayload) => {
     const session = await authService.login(payload);
     applySession(session.token, session.user, session.organization);
-  };
+  }, []);
 
-  const register = async (payload: RegisterPayload) => {
+  const register = useCallback(async (payload: RegisterPayload) => {
     const session = await authService.register(payload);
     applySession(session.token, session.user, session.organization);
-  };
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -108,7 +111,16 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         return Boolean(organization?.featureFlags[featureKey]);
       },
     }),
-    [token, user, organization, loading],
+    [
+      token,
+      user,
+      organization,
+      loading,
+      login,
+      register,
+      logout,
+      refreshSession,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
