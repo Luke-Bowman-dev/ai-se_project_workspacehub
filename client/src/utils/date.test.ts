@@ -3,9 +3,7 @@ import { formatDateMonthAndYear } from "./date";
 
 describe("formatDateMonthAndYear", () => {
   it("formats a date as an abbreviated month and year", () => {
-    expect(formatDateMonthAndYear("2026-01-15T12:00:00.000Z")).toBe(
-      "Jan 2026",
-    );
+    expect(formatDateMonthAndYear("2026-01-15T12:00:00.000Z")).toBe("Jan 2026");
   });
 
   it("returns Not set for missing or invalid values", () => {
