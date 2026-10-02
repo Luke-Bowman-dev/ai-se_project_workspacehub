@@ -6,6 +6,26 @@ export const formatDateTime = (value: string | null | undefined) => {
   return new Date(value).toLocaleString();
 };
 
+/**
+ * Formats a date as an abbreviated month and year.
+ * Example: formatDateMonthAndYear("2026-01-15") returns "Jan 2026".
+ */
+export const formatDateMonthAndYear = (value: string | null | undefined) => {
+  if (!value) {
+    return "Not set";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Not set";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    year: "numeric",
+  }).format(date);
+};
+
 export const formatDateInput = (value: string | null | undefined) => {
   if (!value) {
     return "";
