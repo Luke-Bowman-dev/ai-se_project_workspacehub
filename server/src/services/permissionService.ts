@@ -11,6 +11,13 @@ export const canManageProject = (
   return isPrivilegedRole(actor.role) || actor.userId === String(createdBy);
 };
 
+export const canManageComment = (
+  actor: AuthPayload,
+  authorId: string | null | undefined,
+): boolean => {
+  return isPrivilegedRole(actor.role) || actor.userId === String(authorId);
+};
+
 export const canUpdateTask = (
   actor: AuthPayload,
   assignedTo: string | null | undefined,

@@ -29,6 +29,9 @@ WorkspaceHub is a full-stack project and task tracker: an Express/Mongoose API a
 - Frontend permission checks (`client/src/utils/permissions.ts`) mirror backend rules for UX only — the backend check is the real boundary and
   must exist independently.
 - Don't add a database field or endpoint for something the frontend can derive from data it already has.
+- Authentication: All routes must be protected by the requireAuth middleware.
+- Error Handling: All controller functions must be wrapped in asyncHandler() to automatically catch Promise rejections.
+- Response Formatting: Controllers must use the sendSuccess(res, data) utility instead of calling res.json() directly.
 
 ## Build, test, and validate
 
