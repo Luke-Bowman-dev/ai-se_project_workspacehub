@@ -1,62 +1,141 @@
 import { useState, type FormEvent } from "react";
+import { commentService } from "../services/commentService";
 import type { Comment, User } from "../types/models";
+
+interface PopulatedCommentAuthor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+}
+
+const getPopulatedAuthor = (
+  authorId: unknown,
+): PopulatedCommentAuthor | null => {
+  if (
+    typeof authorId !== "object" ||
+    authorId === null ||
+    !("_id" in authorId) ||
+    !("firstName" in authorId) ||
+    !("lastName" in authorId) ||
+    typeof authorId._id !== "string" ||
+    typeof authorId.firstName !== "string" ||
+    typeof authorId.lastName !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    _id: authorId._id,
+    firstName: authorId.firstName,
+    lastName: authorId.lastName,
+  };
+};
 
 interface TaskCommentsProps {
   taskId: string;
+  commentCount: number;
   users: User[];
 }
 
-export const TaskComments = ({ taskId, users }: TaskCommentsProps) => {
+export const TaskComments = ({
+  taskId,
+  commentCount,
+  users,
+}: TaskCommentsProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [comments, setComments] = useState<Comment[]>(() => [
-    {
-      _id: `mock-comment-${taskId}`,
-      organizationId: users[0]?.organizationId ?? "",
-      taskId,
-      authorId: users[0]?._id ?? "mock-author",
-      content: "Use comments to keep task updates and discussion in one place.",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentsLoaded, setCommentsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const loadComments = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const loadedComments = await commentService.list(taskId);
+      setComments(loadedComments);
+      setCommentsLoaded(true);
+    } catch (error) {
+      setLoadError(
+        error instanceof Error ? error.message : "Unable to load comments",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggle = () => {
+    const willExpand = !isExpanded;
+    setIsExpanded(willExpand);
+
+    if (willExpand && !commentsLoaded && !isLoading) {
+      void loadComments();
+    }
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmedContent = content.trim();
 
-    if (!trimmedContent) {
+    if (!trimmedContent || isSubmitting || !commentsLoaded) {
       return;
     }
 
-    const timestamp = new Date().toISOString();
-    setComments((current) => [
-      {
-        _id: `mock-comment-${Date.now()}`,
-        organizationId: users[0]?.organizationId ?? "",
-        taskId,
-        authorId: users[0]?._id ?? "mock-author",
+    setIsSubmitting(true);
+    setActionError(null);
+
+    try {
+      const createdComment = await commentService.create(taskId, {
         content: trimmedContent,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-      ...current,
-    ]);
-    setContent("");
+      });
+      setComments((current) => [createdComment, ...current]);
+      setContent("");
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Unable to add comment",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <>
       <button
         className="rounded-[10px] border border-slate-200 px-4 py-2 text-sm font-medium text-ink transition hover:bg-slate-50 active:opacity-70"
-        onClick={() => setIsExpanded((current) => !current)}
+        onClick={handleToggle}
         type="button"
       >
-        {isExpanded ? "Hide Comments" : `Show Comments (${comments.length})`}
+        {isExpanded
+          ? "Hide Comments"
+          : `Show Comments (${commentsLoaded ? comments.length : commentCount})`}
       </button>
       {isExpanded ? (
         <section className="basis-full rounded-3xl border border-slate-200 p-4">
-          <form className="space-y-3" onSubmit={handleSubmit}>
+          {isLoading ? (
+            <p className="text-sm text-slate-500">Loading comments...</p>
+          ) : null}
+          {loadError ? (
+            <div className="mb-4" role="alert">
+              <p className="text-sm text-danger">{loadError}</p>
+              <button
+                className="mt-2 text-sm font-medium text-ink underline"
+                disabled={isLoading}
+                onClick={() => void loadComments()}
+                type="button"
+              >
+                Try again
+              </button>
+            </div>
+          ) : null}
+          <form
+            className="space-y-3"
+            onSubmit={(event) => void handleSubmit(event)}
+          >
             <label
               className="block text-sm font-medium text-ink"
               htmlFor={`comment-${taskId}`}
@@ -68,24 +147,34 @@ export const TaskComments = ({ taskId, users }: TaskCommentsProps) => {
               id={`comment-${taskId}`}
               onChange={(event) => setContent(event.target.value)}
               placeholder="Write a comment..."
+              disabled={!commentsLoaded || isSubmitting}
               value={content}
             />
             <button
               className="rounded-[10px] bg-ink px-4 py-2 text-sm font-medium text-white transition hover:opacity-80 active:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={!content.trim()}
+              disabled={!content.trim() || !commentsLoaded || isSubmitting}
               type="submit"
             >
-              Add comment
+              {isSubmitting ? "Adding comment..." : "Add comment"}
             </button>
           </form>
+          {actionError ? (
+            <p className="mt-3 text-sm text-danger" role="alert">
+              {actionError}
+            </p>
+          ) : null}
           <ul className="mt-4 space-y-3">
             {comments.map((comment) => {
+              const populatedAuthor = getPopulatedAuthor(comment.authorId);
               const author = users.find(
-                (user) => user._id === comment.authorId,
+                (user) =>
+                  user._id === (populatedAuthor?._id ?? comment.authorId),
               );
-              const authorName = author
-                ? `${author.firstName} ${author.lastName}`
-                : "Unknown user";
+              const authorName = populatedAuthor
+                ? `${populatedAuthor.firstName} ${populatedAuthor.lastName}`
+                : author
+                  ? `${author.firstName} ${author.lastName}`
+                  : "Unknown user";
 
               return (
                 <li className="rounded-2xl bg-slate-50 p-4" key={comment._id}>
@@ -105,6 +194,9 @@ export const TaskComments = ({ taskId, users }: TaskCommentsProps) => {
               );
             })}
           </ul>
+          {commentsLoaded && comments.length === 0 ? (
+            <p className="mt-4 text-sm text-slate-500">No comments yet.</p>
+          ) : null}
         </section>
       ) : null}
     </>

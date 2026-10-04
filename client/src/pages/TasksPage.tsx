@@ -6,7 +6,12 @@ import { useAuth } from "../hooks/useAuth";
 import { projectService } from "../services/projectService";
 import { taskService } from "../services/taskService";
 import { userService } from "../services/userService";
-import type { Project, Task, User } from "../types/models";
+import type {
+  Project,
+  Task,
+  TaskWithCommentCount,
+  User,
+} from "../types/models";
 import { formatDateInput } from "../utils/date";
 import {
   canDeleteResources,
@@ -46,7 +51,7 @@ export const TasksPage = () => {
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskWithCommentCount[]>([]);
   const [taskEdits, setTaskEdits] = useState<Record<string, TaskFormState>>({});
   const [createState, setCreateState] = useState<TaskFormState>({
     projectId: "",
@@ -109,7 +114,7 @@ export const TasksPage = () => {
         dueDate: createState.dueDate || null,
       });
 
-      setTasks((current) => [createdTask, ...current]);
+      setTasks((current) => [{ ...createdTask, commentCount: 0 }, ...current]);
       setTaskEdits((current) => ({
         ...current,
         [createdTask._id]: buildTaskFormState(createdTask),
@@ -157,7 +162,11 @@ export const TasksPage = () => {
       });
 
       setTasks((current) =>
-        current.map((task) => (task._id === taskId ? updatedTask : task)),
+        current.map((task) =>
+          task._id === taskId
+            ? { ...updatedTask, commentCount: task.commentCount }
+            : task,
+        ),
       );
       setTaskEdits((current) => ({
         ...current,
@@ -454,7 +463,11 @@ export const TasksPage = () => {
                           Delete
                         </button>
                       ) : null}
-                      <TaskComments taskId={task._id} users={users} />
+                      <TaskComments
+                        taskId={task._id}
+                        commentCount={task.commentCount}
+                        users={users}
+                      />
                     </div>
                   </article>
                 </li>
