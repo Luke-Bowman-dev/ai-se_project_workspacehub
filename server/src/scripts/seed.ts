@@ -6,6 +6,7 @@ import { Project } from "../models/Project";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
 import { Comment } from "../models/Comment";
+import { deleteTask } from "../services/taskService";
 
 const seed = async () => {
   await connectToDatabase();
@@ -167,6 +168,32 @@ const seed = async () => {
       content: "I added the analytics gaps I found before leaving.",
     },
   ]);
+
+  const taskToDelete = await Task.create({
+    organizationId: organization._id,
+    projectId: projectOne._id,
+    title: "Temporary seeded task",
+    description: "This task is created and deleted by the seed script.",
+    status: "todo",
+    priority: "low",
+    assignedTo: member._id,
+  });
+
+  await Comment.create({
+    organizationId: organization._id,
+    taskId: taskToDelete._id,
+    authorId: member._id,
+    content: "This comment was added before the task was deleted.",
+  });
+
+  await deleteTask(
+    {
+      userId: String(owner._id),
+      organizationId: String(organization._id),
+      role: owner.role,
+    },
+    String(taskToDelete._id),
+  );
 
   await User.deleteOne({ _id: departingUser._id });
 
