@@ -1,4 +1,5 @@
 import { Router } from "express";
+import commentRoutes from "./commentRoutes";
 import {
   createTaskController,
   deleteTaskController,
@@ -12,6 +13,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 const router = Router();
 
 router.use(asyncHandler(requireAuth));
+router.use("/:taskId/comments", commentRoutes);
 
 router.get("/", asyncHandler(listTasksController));
 router.post("/", asyncHandler(createTaskController));

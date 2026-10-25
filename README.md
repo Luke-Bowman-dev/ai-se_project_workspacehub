@@ -1,8 +1,25 @@
 # WorkspaceHub
 
-WorkspaceHub is a project in TripleTen's AI Software Engineering program. It is a full-stack MERN application built with TypeScript on both the client and server. It supports multi-tenant organizations, role-based access, projects, tasks, bookings, and per-organization feature flags. 
+WorkspaceHub is a project in TripleTen's AI Software Engineering program. It is a full-stack MERN application built with TypeScript on both the client and server. It supports multi-tenant organizations, role-based access, projects, tasks, bookings, and per-organization feature flags.
 
-Students are given this as starting code and, over the course of two sprints, accomplish a number of fixes, refactorings, and new features. The focus of these sprints is on safely and effectively using AI in an existing codebase.
+## Live Link
+
+[Live Website](https://ai-se-project-workspacehub-e3sl-git-work-03aa54-luke-bowman-dev.vercel.app/)
+
+## Features Added to Original Repo
+
+- all inline type annotations are changed into reusable defined types.
+- task count was added to projects
+- added example file with examples of various models for mock data testing
+- added Members card to dashboard that lists all members in the org, and their emails and roles
+- separated load failures and action failures into two different error states
+- added live validation to submission forms
+- hidden ui elements from users who lack the necessary role
+- added prettier and eslint formatting and a script to automatically check and format code
+- added vitest and some test files to test helper functions
+- implemented continous integration
+- implemented a new Comment feature that allows creating, editing, deleting comments on each task
+- reconfigured project to work when deployed via Vercel and MongoDB Atlas
 
 ## Starting stack
 
@@ -12,6 +29,7 @@ Students are given this as starting code and, over the course of two sprints, ac
 - MongoDB + Mongoose
 - JWT authentication
 - Context API for client state
+- Vercel
 
 ## Project Structure
 
